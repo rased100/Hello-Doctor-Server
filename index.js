@@ -19,6 +19,7 @@ async function run() {
         await client.connect();
         const serviceCollection = client.db("hello_doctor").collection("services");
         const bookingCollection = client.db("hello_doctor").collection("bookings");
+        const userCollection = client.db("hello_doctor").collection("users");
 
         app.get('/service', async (req, res) => {
             const query = {};
@@ -27,6 +28,18 @@ async function run() {
             // top 2 line i equal to this line
             // const services = await serviceCollection.find().toArray();
             res.send(services);
+        });
+
+        app.put('/user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send({ result });
         });
 
         app.get('/available', async (req, res) => {
